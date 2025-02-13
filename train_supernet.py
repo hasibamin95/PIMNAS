@@ -62,7 +62,7 @@ def train(args, epoch, train_loader, model, criterion, optimizer):
     for step, (inputs, targets) in enumerate(train_loader):
         inputs, targets = inputs.to(args.device), targets.to(args.device)
         optimizer.zero_grad()
-        choice = utils.random_choice3(args.num_choices, args.layers)
+        choice = utils.random_choice(args.num_choices, args.layers)
         kchoice = list(np.random.randint(args.num_choices, size=args.layers))
         outputs = model(inputs, choice, kchoice)
         loss = criterion(outputs, targets)
@@ -89,7 +89,7 @@ def validate(args, val_loader, model, criterion):
     with torch.no_grad():
         for step, (inputs, targets) in enumerate(val_loader):
             inputs, targets = inputs.to(args.device), targets.to(args.device)
-            choice = utils.random_choice3(args.num_choices, args.layers)
+            choice = utils.random_choice(args.num_choices, args.layers)
             kchoice = list(np.random.randint(args.num_choices, size=args.layers))
             #print("choice = ",choice)
             #print("kchoice = ",kchoice)
