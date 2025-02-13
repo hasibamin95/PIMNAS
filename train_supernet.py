@@ -19,7 +19,7 @@ from torch.utils.data import DataLoader
 from torch.utils.data import Dataset
 
 parser = argparse.ArgumentParser("Single_Path_One_Shot")
-parser.add_argument('--exp_name', type=str, default='spos_c10_k32_64_96_128_ep1k_train_supernet', help='experiment name')
+parser.add_argument('--exp_name', type=str, default='spos_c10_k32_64_128_ep1k_train_supernet', help='experiment name')
 # Supernet Settings
 parser.add_argument('--layers', type=int, default=8, help='batch size')
 parser.add_argument('--num_choices', type=int, default=4, help='number choices per layer')
