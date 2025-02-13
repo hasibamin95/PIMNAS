@@ -93,14 +93,14 @@ class SinglePath_Search(nn.Module):
         self.global_pooling = nn.AdaptiveAvgPool2d((2,2))
         self.fc1 = nn.Parameter(torch.randn(200, 2*2*128))
         self.fc2 = nn.Linear(200, 50)
-        self.out = nn.Linear(50, 10)
+        self.out = nn.Linear(50, self.classes)
         self.relu1 = nn.ReLU(inplace=True)
         self.relu2 = nn.ReLU(inplace=True)
         self.dp1 = nn.Dropout(p=0.2)
         self.dp2 = nn.Dropout(p=0.2)
         #self._initialize_weights()
 
-    def forward(self, x, choice=np.random.randint(3, size=8),kchoice=np.random.randint(2, size=8)):
+    def forward(self, x, choice=np.random.randint(3, size=self.layers),kchoice=np.random.randint(len(self.kernel_list), size=self.layers)):
         for i, j in enumerate(choice):
             if j==3:
                 kchoice[i]=kchoice[i-1]
@@ -112,8 +112,8 @@ class SinglePath_Search(nn.Module):
                     x=self.fixed_block[i][j](x, self.kernel_list[kchoice[i-1]], self.kernel_list[kchoice[i]])
 
         x = self.global_pooling(x)
-        x = x.view(-1, 2*2*self.kernel_list[kchoice[7]])
-        x = F.linear(x, self.fc1[:,:self.kernel_list[kchoice[7]]*2*2])
+        x = x.view(-1, 2*2*self.kernel_list[kchoice[self.layers-1]])
+        x = F.linear(x, self.fc1[:,:self.kernel_list[kchoice[self.layers-1]]*2*2])
         x = self.relu1(x)
         x = self.dp1(x)
         x = self.fc2(x)
