@@ -29,10 +29,10 @@ class VGGBlock(nn.Module):
 class VGGBlock_Nomax(nn.Module):
     def __init__(self, in_channels, out_channels, kernel_size):
         super(VGGBlock_Nomax, self).__init__()
-        self.conv1 = nn.Conv2d(in_channels, out_channels, kernel_size=3, padding=1)
+        self.conv1 = nn.Conv2d(in_channels, out_channels, kernel_size=kernel_size, padding=1)
         self.bn1 = nn.BatchNorm2d(out_channels)
         self.relu1 = nn.ReLU(inplace=True)
-        self.conv2 = nn.Conv2d(out_channels, out_channels, kernel_size=3, padding=1)
+        self.conv2 = nn.Conv2d(out_channels, out_channels, kernel_size=kernel_size, padding=1)
         self.bn2 = nn.BatchNorm2d(out_channels)
         self.relu2 = nn.ReLU(inplace=True)
 
