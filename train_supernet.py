@@ -36,13 +36,13 @@ parser.add_argument('--seed', type=int, default=0, help='training seed')
 # Dataset Settings
 parser.add_argument('--data_root', type=str, default='./dataset/', help='dataset dir')
 parser.add_argument('--classes', type=int, default=10, help='dataset classes')
-parser.add_argument('--dataset', type=int, default='cifar10', help='path to the dataset')
+parser.add_argument('--dataset', type=str, default='cifar10', help='path to the dataset')
 #parser.add_argument('--cutout', action='store_true', help='use cutout')
 #parser.add_argument('--cutout_length', type=int, default=16, help='cutout length')
 #parser.add_argument('--auto_aug', action='store_true', default=False, help='use auto augmentation')
 #parser.add_argument('--resize', action='store_true', default=False, help='use resize')
 #GPU
-parser.add_argument('--gpu', type=str, default=0, help='CUDA device')
+parser.add_argument('--gpu', type=int, default=0, help='CUDA device')
 args = parser.parse_args()
 # Set device
 args.device = torch.device(f'cuda:{gpu}' if torch.cuda.is_available() else 'cpu')
