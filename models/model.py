@@ -99,7 +99,7 @@ class SinglePath_Search(nn.Module):
         self.dp2 = nn.Dropout(p=0.2)
         #self._initialize_weights()
 
-    def forward(self, x, choice=np.random.randint(3, size=self.layers),kchoice=np.random.randint(len(self.kernel_list), size=self.layers)):
+    def forward(self, x, choice, kchoice):
         for i, j in enumerate(choice):
             if j==3:
                 kchoice[i]=kchoice[i-1]
