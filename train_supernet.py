@@ -45,7 +45,7 @@ parser.add_argument('--dataset', type=str, default='cifar10', help='path to the 
 parser.add_argument('--gpu', type=int, default=0, help='CUDA device')
 args = parser.parse_args()
 # Set device
-args.device = torch.device(f'cuda:{gpu}' if torch.cuda.is_available() else 'cpu')
+args.device = torch.device(f'cuda:{args.gpu}' if torch.cuda.is_available() else 'cpu')
 log_format = '%(asctime)s %(message)s'
 logging.basicConfig(stream=sys.stdout, level=logging.INFO,
                     format=log_format, datefmt='%m/%d %I:%M:%S %p')
@@ -124,7 +124,7 @@ def main():
     trainset = datasets.CIFAR10(
         root=os.path.join(args.data_root, args.dataset), train=True, download=True, transform=transform_train)
 
-    trainset, valset = torch.utils.data.random_split(trainset, [42500, 7500], generator = generator1)
+    trainset, valset = torch.utils.data.random_split(trainset, [42500, 7500])
     
     train_loader = torch.utils.data.DataLoader(
         trainset, batch_size=args.batch_size, shuffle=True, num_workers=2)
