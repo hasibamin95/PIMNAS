@@ -3,7 +3,6 @@ import numpy as np
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-from models.block import Choice_Block, Choice_Block_x
 
 class VGGBlock(nn.Module):
     def __init__(self, in_channels, out_channels, kernel_size):
