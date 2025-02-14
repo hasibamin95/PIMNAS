@@ -75,10 +75,10 @@ def get_cand_err(model, cand, args):
         trainset, valset = torch.utils.data.random_split(trainset, [42500, 7500], generator = generator1)
         
         train_loader = torch.utils.data.DataLoader(
-            trainset, batch_size=args.batch_size, shuffle=True, num_workers=2)
+            trainset, batch_size=args.train-batch-size, shuffle=True, num_workers=2)
 
         val_loader = torch.utils.data.DataLoader(
-            valset, batch_size=args.batch_size, shuffle=True, num_workers=2)
+            valset, batch_size=args.test-batch-size, shuffle=True, num_workers=2)
 
         testset = datasets.CIFAR10(
             root=os.path.join(args.data_root, args.dataset), train=False, download=True, transform=transform_test)
@@ -117,13 +117,9 @@ def get_cand_err(model, cand, args):
         # print('train step: {} total: {}'.format(step,max_train_iters))
         data, target = train_dataprovider.next()
         # print('get data',data.shape)
-
         target = target.type(torch.LongTensor)
-
         data, target = data.to(args.device), target.to(args.device)
-
         output = model(data, choice, kchoice)
-
         del data, target, output
     
     top1 = 0
@@ -140,24 +136,17 @@ def get_cand_err(model, cand, args):
         data, target = data.to(args.device), target.to(args.device)
         logits = model(data, choice, kchoice)
         prec1, prec5 = accuracy(logits, target, topk=(1, 5))
-
         # print(prec1.item(),prec5.item())
-
         top1 += prec1.item() * batchsize
         top5 += prec5.item() * batchsize
         total += batchsize
-
         del data, target, logits, prec1, prec5
-
     top1, top5 = top1 / total, top5 / total
-    
     #top1, top5 = top1 / 100, top5 / 100
     #top1, top5 = 1 - top1 / 100, 1 - top5 / 100
-
     #print('top1: {:.2f} top5: {:.2f}'.format(top1 * 100, top5 * 100))
     print('top1: {:.2f} top5: {:.2f}'.format(top1, top5))
     return top1, top5
-    
     # uncomment for latency and energy
     '''
     add_model(choice, kchoice, cand)
