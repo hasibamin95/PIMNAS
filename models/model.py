@@ -147,3 +147,60 @@ class SinglePath_Search(nn.Module):
                     nn.init.constant_(m.bias, 0)
 
 
+class SinglePath_Network(nn.Module):
+    def __init__(self, dataset, classes, layers, choice, kchoice):
+        super(SinglePath_Network, self).__init__()
+        self.classes = classes
+        self.layers = layers
+        self.kernel_list = [32, 64, 128]
+        # choice_block
+        self.fixed_block = nn.ModuleList([])
+        for i,j in enumerate(choice):
+            if i==0:
+                if j==0:
+                    self.fixed_block.append(VGGBlock(in_channels=3, out_channels=self.kernel_list[kchoice[i]], kernel_size=3))
+                elif j==1:
+                    self.fixed_block.append(VGGBlock_Nomax(in_channels=3, out_channels=self.kernel_list[kchoice[i]], kernel_size=3))
+                elif j==2:
+                    self.fixed_block.append(ResidualBlock(in_channels=3, out_channels=self.kernel_list[kchoice[i]], kernel_size=3))
+                else:
+                    kchoice[i] = kchoice[i-1]
+                    continue
+            else:
+                if j==0:
+                    self.fixed_block.append(VGGBlock(in_channels=self.kernel_list[kchoice[i-1]], out_channels=self.kernel_list[kchoice[i]], kernel_size=3))
+                elif j==1:
+                    self.fixed_block.append(VGGBlock_Nomax(in_channels=self.kernel_list[kchoice[i-1]], out_channels=self.kernel_list[kchoice[i]], kernel_size=3))
+                elif j==2:
+                    self.fixed_block.append(ResidualBlock(in_channels=self.kernel_list[kchoice[i-1]], out_channels=self.kernel_list[kchoice[i]], kernel_size=3))
+                else:
+                    kchoice[i] = kchoice[i-1]
+                    continue
+
+        self.global_pooling = nn.AdaptiveAvgPool2d((2,2))
+        self.fc1 = nn.Linear(2*2*self.kernel_list[kchoice[layers-1]], 200)
+        self.relu1 = nn.ReLU(inplace=True)
+        self.dp1 = nn.Dropout(p=0.2)
+        self.fc2 = nn.Linear(200, 50)
+        self.relu2 = nn.ReLU(inplace=True)
+        self.dp2 = nn.Dropout(p=0.2)
+        self.out = nn.Linear(50, 10)
+        #self._initialize_weights()
+
+
+    def forward(self, x):
+        # repeat
+        for i in range(len(self.fixed_block)):
+            x = self.fixed_block[i](x)
+        #x = self.last_conv(x)
+        x = self.global_pooling(x)
+        x = x.reshape(x.shape[0], -1)
+        x = self.fc1(x)
+        x = self.relu1(x)
+        x = self.dp1(x)
+        x = self.fc2(x)
+        x = self.relu2(x)
+        x = self.dp2(x)
+        x = self.out(x)
+        return x
+
