@@ -131,7 +131,7 @@ def main():
         testset, batch_size=args.batch_size, shuffle=False, num_workers=2)
     
     # Define Choice Model
-    cand = [6, 9, 9, 9, 9, 9, 9, 9]
+    cand = [8, 2, 1, 7, 5, 9, 9, 9]
 
     choice = [x//3 for x in cand]
     kchoice = [x%3 for x in cand]
