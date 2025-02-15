@@ -7,12 +7,10 @@ import time
 import torch
 import torch.nn as nn
 import torchvision
-from thop import profile
 from torchvision import datasets
 
 import utils
-from models.model import SinglePath_OneShot
-from models.model2 import SinglePath_Network
+from models.model import SinglePath_Network
 from utils import data_transforms
 
 import torchvision.datasets as datasets
@@ -152,7 +150,6 @@ def main():
     # Print Model Information
     model = model.to(args.device)
     logging.info(model)
-    logging.info('Choice Model Information: params: %.2fM, flops:%.2fM' % ((params / 1e6), (flops / 1e6)))
     print('\n')
 
     # Running
