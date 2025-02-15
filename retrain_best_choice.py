@@ -11,7 +11,6 @@ from torchvision import datasets
 
 import utils
 from models.model1 import SinglePath_Network
-from utils import data_transforms
 
 import torchvision.datasets as datasets
 import torchvision.transforms as transforms
