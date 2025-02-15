@@ -63,8 +63,6 @@ utils.set_seed(args.seed)
 #torch.backends.cudnn.deterministic = True
 
 from tester import get_cand_err
-from flops import get_cand_flops
-
 from torch.autograd import Variable
 import collections
 import sys
@@ -88,9 +86,8 @@ class EvolutionSearcher(object):
         self.m_prob = args.m_prob
         self.crossover_num = args.crossover_num
         self.mutation_num = args.mutation_num
-        self.flops_limit = args.flops_limit
 
-        self.model = SinglePath_Search(args.dataset, args.resize, args.classes, args.layers).to(args.device)
+        self.model = SinglePath_Search(args.dataset, args.classes, args.layers).to(args.device)
         best_supernet_weights = './checkpoints/spos_c10_k32_64_128_ep1k_train_supernet_best.pth'
         checkpoint = torch.load(best_supernet_weights, map_location=args.device)
         self.model.load_state_dict(checkpoint, strict=True)
