@@ -72,7 +72,7 @@ def get_cand_err(model, cand, args):
         trainset = datasets.CIFAR10(
             root=os.path.join(args.data_root, args.dataset), train=True, download=True, transform=transform_train)
 
-        trainset, valset = torch.utils.data.random_split(trainset, [42500, 7500], generator = generator1)
+        trainset, valset = torch.utils.data.random_split(trainset, [42500, 7500])
         
         train_loader = torch.utils.data.DataLoader(
             trainset, batch_size=args.train-batch-size, shuffle=True, num_workers=2)
