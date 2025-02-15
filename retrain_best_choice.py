@@ -41,12 +41,15 @@ parser.add_argument('--seed', type=int, default=0, help='training seed')
 parser.add_argument('--data_root', type=str, default='./dataset/', help='dataset dir')
 parser.add_argument('--classes', type=int, default=10, help='dataset classes')
 parser.add_argument('--dataset', type=str, default='cifar10', help='path to the dataset')
-parser.add_argument('--cutout', action='store_true', help='use cutout')
-parser.add_argument('--cutout_length', type=int, default=16, help='cutout length')
-parser.add_argument('--auto_aug', action='store_true', default=False, help='use auto augmentation')
-parser.add_argument('--resize', action='store_true', default=False, help='use resize')
+#parser.add_argument('--cutout', action='store_true', help='use cutout')
+#parser.add_argument('--cutout_length', type=int, default=16, help='cutout length')
+#parser.add_argument('--auto_aug', action='store_true', default=False, help='use auto augmentation')
+#parser.add_argument('--resize', action='store_true', default=False, help='use resize')
+#GPU
+parser.add_argument('--gpu', type=int, default=0, help='CUDA device')
 args = parser.parse_args()
-args.device = torch.device('cuda:1') if torch.cuda.is_available() else torch.device('cpu')
+# Set device
+args.device = torch.device(f'cuda:{args.gpu}' if torch.cuda.is_available() else 'cpu')
 log_format = '%(asctime)s %(message)s'
 logging.basicConfig(stream=sys.stdout, level=logging.INFO,
                     format=log_format, datefmt='%m/%d %I:%M:%S %p')
@@ -100,29 +103,7 @@ def validate(args, val_loader, model, criterion, choice, kchoice):
 
 
 def main():
-    # Define Dataset
-    '''
-    assert args.dataset in ['cifar10', 'imagenet']
-    train_transform, valid_transform = data_transforms(args)
-    if args.dataset == 'cifar10':
-        trainset = torchvision.datasets.CIFAR10(root=os.path.join(args.data_root, args.dataset),
-                                                train=True, download=True, transform=train_transform)
-        train_loader = torch.utils.data.DataLoader(trainset, batch_size=args.batch_size,
-                                                   shuffle=True, pin_memory=True, num_workers=8)
-        valset = torchvision.datasets.CIFAR10(root=os.path.join(args.data_root, args.dataset),
-                                              train=False, download=True, transform=valid_transform)
-        val_loader = torch.utils.data.DataLoader(valset, batch_size=args.batch_size,
-                                                 shuffle=False, pin_memory=True, num_workers=8)
-    elif args.dataset == 'imagenet':
-        train_data_set = datasets.ImageNet(os.path.join(args.data_root, args.dataset, 'train'), train_transform)
-        val_data_set = datasets.ImageNet(os.path.join(args.data_root, args.dataset, 'valid'), valid_transform)
-        train_loader = torch.utils.data.DataLoader(train_data_set, batch_size=args.batch_size, shuffle=True,
-                                                   num_workers=8, pin_memory=True, sampler=None)
-        val_loader = torch.utils.data.DataLoader(val_data_set, batch_size=args.batch_size, shuffle=False,
-                                                 num_workers=8, pin_memory=True)
-    else:
-        raise ValueError('Undefined dataset !!!')
-    '''
+    # Define Data
     print('==> Preparing data..')
     transform_train = transforms.Compose([
         transforms.RandomCrop(32, padding=4),
@@ -135,35 +116,31 @@ def main():
         transforms.ToTensor(),
         transforms.Normalize((0.4914, 0.4822, 0.4465), (0.2023, 0.1994, 0.2010)),
     ])
-    generator1 = torch.Generator().manual_seed(42)
+    #generator1 = torch.Generator().manual_seed(42)
     trainset = datasets.CIFAR10(
-        root='./data', train=True, download=True, transform=transform_train)
+        root=os.path.join(args.data_root, args.dataset), train=True, download=True, transform=transform_train)
 
-    trainset, valset = torch.utils.data.random_split(trainset, [42500, 7500], generator = generator1)
-
+    trainset, valset = torch.utils.data.random_split(trainset, [42500, 7500])
+    
     train_loader = torch.utils.data.DataLoader(
-        trainset, batch_size=128, shuffle=True, num_workers=2)
+        trainset, batch_size=args.batch_size, shuffle=True, num_workers=2)
 
     val_loader = torch.utils.data.DataLoader(
-        valset, batch_size=100, shuffle=True, num_workers=2)
+        valset, batch_size=args.batch_size, shuffle=True, num_workers=2)
 
     testset = datasets.CIFAR10(
-        root='./data', train=False, download=True, transform=transform_test)
+        root=os.path.join(args.data_root, args.dataset), train=False, download=True, transform=transform_test)
     test_loader = torch.utils.data.DataLoader(
-        testset, batch_size=100, shuffle=False, num_workers=2)
-
+        testset, batch_size=args.batch_size, shuffle=False, num_workers=2)
+    
     # Define Choice Model
     cand = [6, 9, 9, 9, 9, 9, 9, 9]
 
     choice = [x//3 for x in cand]
     kchoice = [x%3 for x in cand]
 
-    #choice =  [1, 3, 1, 0, 1, 2, 1, 0]
-    #kchoice =  [2, 1, 1, 2, 1, 1, 0, 0]
-    #choice = [1, 0, 3, 1, 3, 0, 3, 0, 0, 3, 3, 0, 1, 0, 1, 2, 2, 1, 1, 3]
-    #model = SinglePath_OneShot(args.dataset, args.resize, args.classes, args.layers)
-    model = SinglePath_Network(args.dataset, args.resize, args.classes, args.layers, choice, kchoice)
-    #best_supernet_weights = './checkpoints/spos_c10_train_supernet_best.pth'
+    model = SinglePath_Network(args.dataset, args.classes, args.layers, choice, kchoice)
+    #best_supernet_weights = './checkpoints/spos_c10_k32_64_128_train_supernet_best.pth'
     #checkpoint = torch.load(best_supernet_weights, map_location=args.device)
     #model.load_state_dict(checkpoint, strict=True)
     #logging.info('Finish loading checkpoint from %s', best_supernet_weights)
@@ -173,8 +150,6 @@ def main():
     scheduler = torch.optim.lr_scheduler.LambdaLR(optimizer, lambda epoch: 1 - (epoch / args.epochs))
 
     # Print Model Information
-    flops, params = profile(model, inputs=(torch.randn(1, 3, 32, 32),) if args.dataset == 'cifar10'
-                            else (torch.randn(1, 3, 224, 224),), verbose=False)
     model = model.to(args.device)
     logging.info(model)
     logging.info('Choice Model Information: params: %.2fM, flops:%.2fM' % ((params / 1e6), (flops / 1e6)))
