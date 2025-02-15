@@ -88,8 +88,11 @@ def get_cand_err(model, cand, args):
         train_dataprovider = DataIterator(train_loader)
         val_dataprovider = DataIterator(val_loader)
 
-    max_train_iters = len(train_loader)
-    max_test_iters = len(val_loader)
+        #args.max_train_iters = len(train_loader)
+        #args.max_test_iters = len(val_loader)
+
+    max_train_iters = args.max_train_iters
+    max_test_iters = args.max_test_iters
     
     
     cand = list(cand)
