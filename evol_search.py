@@ -47,7 +47,7 @@ parser.add_argument('--dataset', type=str, default='cifar10', help='path to the 
 #parser.add_argument('--auto_aug', action='store_true', default=False, help='use auto augmentation')
 #parser.add_argument('--resize', action='store_true', default=False, help='use resize')
 # GPU
-parser.add_argument('--gpu', type=str, default=0, help='CUDA device')
+parser.add_argument('--gpu', type=int, default=0, help='CUDA device')
 args = parser.parse_args()
 args.device = torch.device(f'cuda:{args.gpu}' if torch.cuda.is_available() else 'cpu')
 log_format = '%(asctime)s %(message)s'
