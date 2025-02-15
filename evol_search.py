@@ -25,15 +25,15 @@ parser.add_argument('--m_prob', type=float, default=0.1)
 parser.add_argument('--crossover-num', type=int, default=25)
 parser.add_argument('--mutation-num', type=int, default=25)
 #parser.add_argument('--flops-limit', type=float, default=330 * 1e6)
-#parser.add_argument('--max-train-iters', type=int, default=200)
-#parser.add_argument('--max-test-iters', type=int, default=40)
+parser.add_argument('--max-train-iters', type=int, default=200)
+parser.add_argument('--max-test-iters', type=int, default=40)
 parser.add_argument('--train-batch-size', type=int, default=128)
 parser.add_argument('--test-batch-size', type=int, default=200)
 
 parser.add_argument('--exp_name', type=str, default='spos_c10_train_supernet', help='experiment name')
 # Supernet Settings
 parser.add_argument('--layers', type=int, default=8, help='batch size')
-parser.add_argument('--num_choices', type=int, default=4, help='number choices per layer')
+parser.add_argument('--num_choices', type=int, default=10, help='number choices per layer')
 # Search Settings
 parser.add_argument('--batch_size', type=int, default=256, help='batch size')
 parser.add_argument('--search_num', type=int, default=1000, help='search number')
